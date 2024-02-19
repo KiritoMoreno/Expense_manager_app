@@ -55,8 +55,11 @@
                 android:layout_height="wrap_content"
                 android:margin="10dp"
                 android:text="Log In"
+                android:background="@drawable/edittext_background"
                 android:id="@+id/btn_login"
                 android:padding="15dp"
+                android:textColor="@android:color/white"
+
                 android:textAppearance="?android:textAppearanceMedium"
                 />
 
