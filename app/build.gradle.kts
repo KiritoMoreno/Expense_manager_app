@@ -1,6 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -36,6 +38,21 @@ android {
 }
 
 dependencies {
+
+    // Import the BoM for the Firebase platform
+    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
+3
+    // Add the dependency for the Firebase Authentication library
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-core:10.0.1")
+    implementation("com.google.firebase:firebase-auth:10.0.1")
+    implementation("com.google.firebase:firebase-database:10.0.1")
+    implementation("com.firebase:firebase-client-android:2.5.2")
+    implementation("com.firebaseui:firebase-ui-database:0.4.0")
+
+
+
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
