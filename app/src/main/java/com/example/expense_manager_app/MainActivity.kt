@@ -1,5 +1,6 @@
 package com.example.expense_manager_app
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -7,7 +8,9 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {
     private lateinit var mEmail: EditText
@@ -15,6 +18,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnLogin: Button
     private lateinit var mForgetPassword: TextView
     private lateinit var mSignupHere: TextView
+
+    private lateinit var mDialog:ProgressDialog
+    //Firebase..
+    private lateinit var mAuth:FirebaseAuth
+
 
     private fun loginDetails() {
 
@@ -36,6 +44,20 @@ class MainActivity : AppCompatActivity() {
                 if (TextUtils.isEmpty(pass)) {
                     mPass.setError("Password Required..")
                     return
+                }
+                mDialog.setMessage("Processing..")
+                mDialog.show()
+
+                mAuth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        mDialog.dismiss()
+                        startActivity(Intent(applicationContext,HomeActivity::class.java))
+                        Toast.makeText(applicationContext, "Login Successful..", Toast.LENGTH_SHORT).show()
+
+                    } else {
+                        mDialog.dismiss()
+                        Toast.makeText(applicationContext, "Login Failed..", Toast.LENGTH_SHORT).show()
+                    }
                 }
             }
         })
@@ -59,6 +81,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        mAuth=FirebaseAuth.getInstance()
+        mDialog=ProgressDialog(this)
         loginDetails()
     }
 }
