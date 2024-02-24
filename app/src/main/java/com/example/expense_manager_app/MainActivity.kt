@@ -82,6 +82,12 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         mAuth=FirebaseAuth.getInstance()
+
+        if (mAuth.currentUser != null) {
+            startActivity(Intent(applicationContext, HomeActivity::class.java))
+            finish()  // Finalizar la actividad actual si ya hay un usuario autenticado
+        }
+
         mDialog=ProgressDialog(this)
         loginDetails()
     }
