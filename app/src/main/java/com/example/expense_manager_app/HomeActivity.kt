@@ -10,6 +10,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.example.expense_manager_app.R.id.income
 import com.example.expense_manager_app.R.id.main_frame
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -20,6 +21,10 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var frameLayout: FrameLayout
 
+    // Fragment
+    private lateinit var dashBoardFragment: DashBoardFragment
+    private lateinit var incomeFragment: IncomeFragment
+    private lateinit var expenseFragment: ExpenseFragment
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,26 +47,37 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val NavigationView = findViewById<NavigationView>(R.id.navView)
         NavigationView.setNavigationItemSelectedListener(this)
 
+        dashBoardFragment = DashBoardFragment()
+        incomeFragment = IncomeFragment()
+        expenseFragment = ExpenseFragment()
+
+        setFragment(dashBoardFragment);
+
         bottomNavigationView.setOnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.dashboard -> {
+                    setFragment(dashBoardFragment)
                     bottomNavigationView.setItemBackgroundResource(R.color.dashboard_color)
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.income -> {
+                    setFragment(incomeFragment)
                     bottomNavigationView.setItemBackgroundResource(R.color.income_color)
                     return@setOnNavigationItemSelectedListener true
                 }
                 R.id.expense -> {
+                    setFragment(expenseFragment)
                     bottomNavigationView.setItemBackgroundResource(R.color.expense_color)
                     return@setOnNavigationItemSelectedListener true
                 }
                 else -> false
             }
         }
-
-
-
+    }
+    private fun setFragment(fragment: Fragment) {
+        val fragmentTransaction: FragmentTransaction = supportFragmentManager.beginTransaction()
+        fragmentTransaction.replace(R.id.main_frame, fragment)
+        fragmentTransaction.commit()
     }
 
     override fun onBackPressed() {
@@ -76,9 +92,9 @@ class HomeActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
     private fun displaySelectedListener(itemId: Int) {
         var fragment: Fragment? = null
         when (itemId) {
-            R.id.dashboard -> {return}
-            R.id.income -> {return}
-            R.id.expense -> {return}
+            R.id.dashboard -> fragment = DashBoardFragment()
+            R.id.income -> fragment = IncomeFragment()
+            R.id.expense -> fragment = ExpenseFragment()
         }
         if (fragment != null) {
             val ft = supportFragmentManager.beginTransaction()
