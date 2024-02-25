@@ -1,10 +1,13 @@
 package com.example.expense_manager_app
 
 import Model.Data
+import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -29,6 +32,14 @@ class IncomeFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     // Text View
     private lateinit var incomeTotalSum: TextView
+    // Update edit text
+    private lateinit var edtAmmount: EditText
+    private lateinit var edtType: EditText
+    private lateinit var edtNote: EditText
+    //Button for update and delete
+    private lateinit var btnUpdate: Button
+    private lateinit var btnDelete: Button
+
 
 
     override fun onCreateView(
@@ -98,6 +109,8 @@ class IncomeFragment : Fragment() {
                 holder.setNote(model.note ?: "")
                 holder.setDate(model.date ?: "")
                 holder.setAmount(model.amount ?: 0)
+                holder.mView.setOnClickListener {
+                    updateDataItem()}
             }
         }
 
@@ -108,7 +121,7 @@ class IncomeFragment : Fragment() {
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private val mView: View = itemView
+        val mView: View = itemView
 
         fun setType(type: String) {
             val mType: TextView = mView.findViewById(R.id.type_txt_income)
@@ -131,4 +144,30 @@ class IncomeFragment : Fragment() {
             mAmmount.text = stAmmount
         }
     }
+    fun updateDataItem() {
+        val mydialog = AlertDialog.Builder(requireActivity())
+        val inflater = LayoutInflater.from(requireActivity())
+        val myview = inflater.inflate(R.layout.update_data_item, null)
+        mydialog.setView(myview)
+
+        edtAmmount = myview.findViewById(R.id.ammount_edt)
+        edtType = myview.findViewById(R.id.type_edt)
+        edtNote = myview.findViewById(R.id.note_edt)
+
+        btnUpdate = myview.findViewById(R.id.btn_upd_update)
+        btnDelete = myview.findViewById(R.id.btn_upd_delete)
+
+        val dialog: AlertDialog = mydialog.create()
+
+        btnUpdate.setOnClickListener {
+            // Lógica para el botón de actualización
+        }
+
+        btnDelete.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
 }
