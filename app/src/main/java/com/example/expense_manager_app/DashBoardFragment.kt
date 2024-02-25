@@ -218,7 +218,14 @@ class DashBoardFragment : Fragment() {
                 edtNote.error = "Required Field.."
                 return@setOnClickListener
             }
-            
+            //-- check here
+            val id = mExpenseDatabase.push().key
+            val mDate = SimpleDateFormat.getDateInstance().format(Date())
+
+            val data = Data(ourAmountint, type, note,id, mDate)
+            mExpenseDatabase.child(id!!).setValue(data)
+            Toast.makeText(requireActivity(), "Data ADDED", Toast.LENGTH_SHORT).show()
+
             // Cierre del diálogo después de realizar la lógica
             ftAnimation()
             dialog.dismiss()
