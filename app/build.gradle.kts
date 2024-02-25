@@ -49,6 +49,8 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:10.0.1")
     implementation("com.google.firebase:firebase-database:10.0.1")
     implementation("com.firebase:firebase-client-android:2.5.2")
+    implementation ("com.firebaseui:firebase-ui-database:8.0.0")
+
 
 
 
