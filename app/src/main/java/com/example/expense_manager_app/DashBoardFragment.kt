@@ -1,6 +1,8 @@
 package com.example.expense_manager_app
 
+import Model.Data
 import android.app.AlertDialog
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -11,11 +13,13 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import java.util.Date
 
 class DashBoardFragment : Fragment() {
 
@@ -50,8 +54,10 @@ class DashBoardFragment : Fragment() {
         val mUser: FirebaseUser? = mAuth.currentUser
         val uid: String = mUser?.uid ?: ""
 
-        val mIncomeDatabase = FirebaseDatabase.getInstance().getReference().child("IncomeData").child(uid)
-        val mExpenseDatabase = FirebaseDatabase.getInstance().getReference().child("ExpenseDatabase").child(uid)
+        // En lugar de crear nuevas variables locales, inicializa las propiedades de la clase
+        mIncomeDatabase = FirebaseDatabase.getInstance().getReference().child("IncomeData").child(uid)
+        mExpenseDatabase = FirebaseDatabase.getInstance().getReference().child("ExpenseDatabase").child(uid)
+
 
 
         // Connect floating buttons to layout
@@ -73,7 +79,7 @@ class DashBoardFragment : Fragment() {
                 openFabMenu()
             }
         }
-
+        addData()
         return myView
     }
 
@@ -100,6 +106,13 @@ class DashBoardFragment : Fragment() {
         fabExpenseTxt.isClickable = false
         isOpen = false
     }
+    private fun ftAnimation(){
+        if (isOpen) {
+            closeFabMenu()
+        } else {
+            openFabMenu()
+        }
+    }
     private fun addData() {
         fabIncomeBtn.setOnClickListener {
             // Lógica para el botón de ingresos
@@ -108,6 +121,7 @@ class DashBoardFragment : Fragment() {
 
         fabExpenseBtn.setOnClickListener {
             // Lógica para el botón de gastos
+            expenseDataInsert()
         }
     }
     fun incomeDataInsert() {
@@ -117,6 +131,7 @@ class DashBoardFragment : Fragment() {
         mydialog.setView(myview)
 
         val dialog = mydialog.create()
+        dialog.setCancelable(false)
 
         val edtAmount = myview.findViewById<EditText>(R.id.ammount_edt)
         val edtType = myview.findViewById<EditText>(R.id.type_edt)
@@ -139,7 +154,65 @@ class DashBoardFragment : Fragment() {
                 return@setOnClickListener
             }
 
-            val ourAmount = amount.toInt()
+            val ourAmountint = amount.toInt()
+
+            if (note.isEmpty()) {
+                edtNote.error = "Required Field.."
+                return@setOnClickListener
+            }
+            val id = mIncomeDatabase.push().key
+            val mDate = SimpleDateFormat.getDateInstance().format(Date())
+
+            val data = Data(ourAmountint, type, note,id, mDate)
+            mIncomeDatabase.child(id!!).setValue(data)
+            Toast.makeText(requireActivity(), "Data ADDED", Toast.LENGTH_SHORT).show()
+
+            // Cierre del diálogo después de realizar la lógica
+            ftAnimation()
+            dialog.dismiss()
+        }
+
+        btnCancel.setOnClickListener {
+            // Lógica de cancelación si es necesario
+            ftAnimation()
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    fun expenseDataInsert(){
+
+        val mydialog = AlertDialog.Builder(requireActivity())
+        val inflater = LayoutInflater.from(requireActivity())
+        val myview = inflater.inflate(R.layout.custom_layout_for_insertdata, null)
+        mydialog.setView(myview)
+
+        val dialog = mydialog.create()
+        dialog.setCancelable(false)
+
+        val edtAmount = myview.findViewById<EditText>(R.id.ammount_edt)
+        val edtType = myview.findViewById<EditText>(R.id.type_edt)
+        val edtNote = myview.findViewById<EditText>(R.id.note_edt)
+        val btnSave = myview.findViewById<Button>(R.id.btnSave)
+        val btnCancel = myview.findViewById<Button>(R.id.btnCancel)
+
+        btnSave.setOnClickListener {
+            val type = edtType.text.toString().trim()
+            val amount = edtAmount.text.toString().trim()
+            val note = edtNote.text.toString().trim()
+
+            if (type.isEmpty()) {
+                edtType.error = "Required Field.."
+                return@setOnClickListener
+            }
+
+            if (amount.isEmpty()) {
+                edtAmount.error = "Required Field.."
+                return@setOnClickListener
+            }
+
+            val ourAmountint = amount.toInt()
 
             if (note.isEmpty()) {
                 edtNote.error = "Required Field.."
@@ -147,15 +220,16 @@ class DashBoardFragment : Fragment() {
             }
             
             // Cierre del diálogo después de realizar la lógica
+            ftAnimation()
             dialog.dismiss()
         }
 
         btnCancel.setOnClickListener {
             // Lógica de cancelación si es necesario
+            ftAnimation()
             dialog.dismiss()
         }
 
         dialog.show()
     }
-
 }
