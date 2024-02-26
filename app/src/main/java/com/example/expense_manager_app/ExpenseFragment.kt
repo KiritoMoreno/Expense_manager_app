@@ -1,11 +1,14 @@
 package com.example.expense_manager_app
 
 import Model.Data
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +21,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.text.DateFormat
+import java.util.Date
 
 class ExpenseFragment : Fragment() {
 
@@ -29,6 +34,20 @@ class ExpenseFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
 
     private lateinit var expenseTotalSum: TextView
+
+    // Update edit text
+    private lateinit var edtAmmount: EditText
+    private lateinit var edtType: EditText
+    private lateinit var edtNote: EditText
+    //Button for update and delete
+    private lateinit var btnUpdate: Button
+    private lateinit var btnDelete: Button
+
+    // data item value
+    private var type: String? = null
+    private var note: String? = null
+    private var amount: Int = 0
+    private var post_key: String? = null
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -94,6 +113,14 @@ class ExpenseFragment : Fragment() {
                 holder.setNote(model.note ?: "")
                 holder.setDate(model.date ?: "")
                 holder.setAmount(model.amount ?: 0)
+                holder.mView.setOnClickListener {
+                    post_key = getRef(position).key
+                    type = model.type
+                    note = model.note
+                    amount = model.amount
+                    updateDataItem()
+
+                }
             }
         }
 
@@ -104,7 +131,7 @@ class ExpenseFragment : Fragment() {
 
     class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        private val mView: View = itemView
+        val mView: View = itemView
 
         fun setType(type: String) {
             val mType: TextView = mView.findViewById(R.id.type_txt_expense)
@@ -126,5 +153,49 @@ class ExpenseFragment : Fragment() {
             val stAmmount: String = amount.toString()
             mAmmount.text = stAmmount
         }
+    }
+    fun updateDataItem() {
+        val mydialog = AlertDialog.Builder(requireActivity())
+        val inflater = LayoutInflater.from(requireActivity())
+        val myview = inflater.inflate(R.layout.update_data_item, null)
+        mydialog.setView(myview)
+
+        edtAmmount = myview.findViewById(R.id.ammount_edt)
+        edtType = myview.findViewById(R.id.type_edt)
+        edtNote = myview.findViewById(R.id.note_edt)
+
+        // Set data to edit text..
+        edtType.setText(type)
+        edtType.setSelection(type?.length ?: 0)
+
+        edtNote.setText(note)
+        edtNote.setSelection(note?.length ?: 0)
+
+        edtAmmount.setText(amount.toString())
+        edtAmmount.setSelection(amount.toString().length)
+
+
+        btnUpdate = myview.findViewById(R.id.btn_upd_update)
+        btnDelete = myview.findViewById(R.id.btn_upd_delete)
+
+        val dialog: AlertDialog = mydialog.create()
+
+        btnUpdate.setOnClickListener {
+            type = edtType.text.toString().trim()
+            note = edtNote.text.toString().trim()
+            val mdAmmount = edtAmmount.text.toString().trim()
+            val myAmmount = if (mdAmmount.isNotEmpty()) mdAmmount.toInt() else 0
+            val mDate = DateFormat.getDateInstance().format(Date())
+            val data = Data(myAmmount, type, note, post_key, mDate)
+            mExpenseDatabase.child(post_key!!).setValue(data)
+            dialog.dismiss()
+        }
+
+        btnDelete.setOnClickListener {
+            mExpenseDatabase.child(post_key!!).removeValue()
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }
