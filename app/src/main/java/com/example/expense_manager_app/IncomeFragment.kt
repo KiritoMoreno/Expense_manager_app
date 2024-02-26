@@ -1,8 +1,10 @@
 package com.example.expense_manager_app
 
+import java.text.DateFormat
 import Model.Data
 import android.app.AlertDialog
 import android.os.Bundle
+
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +23,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.util.Date
 
 class IncomeFragment : Fragment() {
 
@@ -182,10 +185,18 @@ class IncomeFragment : Fragment() {
         val dialog: AlertDialog = mydialog.create()
 
         btnUpdate.setOnClickListener {
-            // Lógica para el botón de actualización
+            type = edtType.text.toString().trim()
+            note = edtNote.text.toString().trim()
+            val mdAmmount = edtAmmount.text.toString().trim()
+            val myAmmount = if (mdAmmount.isNotEmpty()) mdAmmount.toInt() else 0
+            val mDate = DateFormat.getDateInstance().format(Date())
+            val data = Data(myAmmount, type, note, post_key, mDate)
+            mIncomeDatabase.child(post_key!!).setValue(data)
+            dialog.dismiss()
         }
 
         btnDelete.setOnClickListener {
+            mIncomeDatabase.child(post_key!!).removeValue()
             dialog.dismiss()
         }
 
