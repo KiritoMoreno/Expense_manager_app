@@ -17,8 +17,11 @@ import android.widget.Toast
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import java.util.Date
 
 class DashBoardFragment : Fragment() {
@@ -38,6 +41,10 @@ class DashBoardFragment : Fragment() {
     // Animations
     private lateinit var fadeOpen: Animation
     private lateinit var fadeClose: Animation
+
+    //Dashboard income and expense result
+    private lateinit var  totalIncomeResult: TextView
+    private lateinit var  totalExpenseResult: TextView
 
     //Firebase..
     private lateinit var mAuth: FirebaseAuth
@@ -69,6 +76,10 @@ class DashBoardFragment : Fragment() {
         fabIncomeTxt = myView.findViewById(R.id.income_ft_text)
         fabExpenseTxt = myView.findViewById(R.id.expense_ft_text)
 
+        //Total income and expense result set..
+        totalIncomeResult = myView.findViewById(R.id.income_ft_text)
+        totalExpenseResult = myView.findViewById(R.id.expense_ft_text)
+
         fadeOpen = AnimationUtils.loadAnimation(requireActivity(), R.anim.fade_open)
         fadeClose = AnimationUtils.loadAnimation(requireActivity(), R.anim.fade_close)
 
@@ -79,6 +90,40 @@ class DashBoardFragment : Fragment() {
                 openFabMenu()
             }
         }
+        // Calculate total income:.
+        mIncomeDatabase.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                var totalsum = 0
+                for (mysnap in dataSnapshot.children) {
+                    val data = mysnap.getValue(Data::class.java)
+                    totalsum += data?.amount ?: 0
+                }
+
+                val stResult = totalsum.toString()
+                totalIncomeResult.text = stResult
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Handle the cancellation as needed
+            }
+        })
+        mExpenseDatabase.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                var totalsum = 0
+                for (mysnap in dataSnapshot.children) {
+                    val data = mysnap.getValue(Data::class.java)
+                    totalsum += data?.amount ?: 0
+                }
+
+                val stResult = totalsum.toString()
+                totalExpenseResult.text = stResult
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Handle the cancellation as needed
+            }
+        })
+
         addData()
         return myView
     }
