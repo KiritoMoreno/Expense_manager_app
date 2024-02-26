@@ -40,6 +40,11 @@ class IncomeFragment : Fragment() {
     private lateinit var btnUpdate: Button
     private lateinit var btnDelete: Button
 
+    // data item value
+    private var type: String? = null
+    private var note: String? = null
+    private var amount: Int = 0
+    private var post_key: String? = null
 
 
     override fun onCreateView(
@@ -110,7 +115,13 @@ class IncomeFragment : Fragment() {
                 holder.setDate(model.date ?: "")
                 holder.setAmount(model.amount ?: 0)
                 holder.mView.setOnClickListener {
-                    updateDataItem()}
+                    post_key = getRef(position).key
+                    type = model.type
+                    note = model.note
+                    amount = model.amount
+                    updateDataItem()
+
+                }
             }
         }
 
@@ -153,6 +164,17 @@ class IncomeFragment : Fragment() {
         edtAmmount = myview.findViewById(R.id.ammount_edt)
         edtType = myview.findViewById(R.id.type_edt)
         edtNote = myview.findViewById(R.id.note_edt)
+
+        // Set data to edit text..
+        edtType.setText(type)
+        edtType.setSelection(type?.length ?: 0)
+
+        edtNote.setText(note)
+        edtNote.setSelection(note?.length ?: 0)
+
+        edtAmmount.setText(amount.toString())
+        edtAmmount.setSelection(amount.toString().length)
+
 
         btnUpdate = myview.findViewById(R.id.btn_upd_update)
         btnDelete = myview.findViewById(R.id.btn_upd_delete)
